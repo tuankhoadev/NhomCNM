@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+interface IUserManager {
+    function addUser(
+        string memory  _Id,
+        string memory _userName,
+        uint _age,
+        string memory _addressLocation
+    ) external;
+
+    function updateUser(
+        string memory _userId,
+        string memory _userName,
+        uint _age,
+        string memory _addressLocation
+    ) external;
+
+    function deleteUser(string memory _userId) external;
+
+    function getUserById(string memory _userId)
+        external
+        view
+        returns (string memory, string memory, uint, string memory);
+}
+contract UserManager {
+    struct User {
+        string Id;
+        string userName;
+        uint age;
+        string addressLocation;
+    }
+    uint public index;
+    mapping(string => User) private users;
+    string[] private userIds;
+
+    // function genID() private returns (string memory) {
+    //     index += 1;
+    //     return string(abi.encodePacked("player", string.toString(index)));
+    // }
+    // Thêm người dùng vào hệ thống
+    function addUser(string memory _Id, string memory _userName, uint _age, string memory _addressLocation) public {
+        require(bytes(_Id).length > 0, "User ID cannot be empty");
+        require(bytes(users[_Id].Id).length == 0, "User ID already exists");
+
+        users[_Id] = User(_Id, _userName, _age, _addressLocation);
+        userIds.push(_Id);
+    }
+
+    // Cập nhật thông tin người dùng bởi ID
+    function updateUser(string memory _userId, string memory _userName, uint _age, string memory _addressLocation) public {
+        require(bytes(users[_userId].Id).length > 0, "User does not exist");
+
+        users[_userId].userName = _userName;
+        users[_userId].age = _age;
+        users[_userId].addressLocation = _addressLocation;
+    }
+
+    // Xóa người dùng bởi ID
+    function deleteUser(string memory _userId) public {
+        require(bytes(users[_userId].Id).length > 0, "User does not exist");
+
+        delete users[_userId];
+
+        for (uint i = 0; i < userIds.length; i++) {
+            if (keccak256(bytes(userIds[i])) == keccak256(bytes(_userId))) {
+                userIds[i] = userIds[userIds.length - 1];
+                userIds.pop();
+                break;
+            }
+        }
+    }
+
+    // Tìm kiếm người dùng theo ID
+    function getUserById(string memory _userId) public view returns (string memory, string memory, uint, string memory) {
+        require(bytes(users[_userId].Id).length > 0, "User does not exist");
+
+        User memory user = users[_userId];
+        return (user.Id, user.userName, user.age, user.addressLocation);
+    }
+
+    // Sắp xếp người dùng theo độ tuổi
+    function getSortedUsersByAge() public view returns (User[] memory) {
+        User[] memory sortedUsers = new User[](userIds.length);
+        
+        for (uint i = 0; i < userIds.length; i++) {
+            sortedUsers[i] = users[userIds[i]];
+        }
+
+        // Bubble sort theo độ tuổi
+        for (uint i = 0; i < sortedUsers.length; i++) {
+            for (uint j = 0; j < sortedUsers.length - 1 - i; j++) {
+                if (sortedUsers[j].age > sortedUsers[j + 1].age) {
+                    User memory temp = sortedUsers[j];
+                    sortedUsers[j] = sortedUsers[j + 1];
+                    sortedUsers[j + 1] = temp;
+                }
+            }
+        }
+
+        return sortedUsers;
+    }
+
+    // Hiển thị danh sách người dùng
+    function getAllUsers() public view returns (User[] memory) {
+        User[] memory allUsers = new User[](userIds.length);
+        
+        for (uint i = 0; i < userIds.length; i++) {
+            allUsers[i] = users[userIds[i]];
+        }
+
+        return allUsers;
+    }
+    
+}
