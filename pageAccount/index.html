@@ -44,6 +44,12 @@
             </div>
 
             <div class="btnAddAccount">
+              <button id="btnConnectWallet" onclick="connectMetaMask()">Connect Wallet</button>
+              <button id="btnConnectconnection" onclick="checkContractConnection()">Connect contract</button>
+              <span id="walletStatus" style="margin-left: 10px; font-weight: bold;">Not Connected</span>
+            </div>
+            <div id="walletInfo" style="margin-top: 10px; display: none;">
+              <p><strong>Connected Account:</strong> <span id="accountAddress"></span></p>
               <button id="btnShowAdd">Add User</button>
             </div>
           </div>
@@ -66,6 +72,7 @@
                           </tr>
                         </thead>
                         <tbody id="accountsListContainer">
+                          <div id="userList"></div> <!-- Hiển thị danh sách người dùng -->
                           <tr>
                             <td class="text-center" id="Nam"></td>
                             <td class="text-center" id="Age"></td>
@@ -133,7 +140,7 @@
       </div>
     </div>
     <script src="./page.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

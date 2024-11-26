@@ -153,8 +153,10 @@ h3 {
 .container-list {
   width: 80%;
   margin: auto;
-  margin-top: 50px;
+  margin-top: 100px;
+  transition: margin-top 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
 }
+
 .text-center {
   text-align: center;
 }
