@@ -280,41 +280,30 @@ async function checkContractConnection() {
   }
 }
 
-
-
 async function connectMetaMask() {
   if (typeof window.ethereum !== "undefined") {
     try {
-      // Request the user's accounts
       const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts", // Request accounts permission
+        method: "eth_requestAccounts",
       });
-      const account = accounts[0]; // Get the first account
-      document.getElementById("walletStatus").textContent = `Connected: ${account}`;
-
-      // Display the account information
-      document.getElementById("walletInfo").textContent = account;
-
-      // Optionally return the account if needed elsewhere
-      return account;
+      console.log("Connected account:", accounts[0]);
+      document.getElementById(
+        "page-actions"
+      ).innerHTML = `Connected: ${accounts[0]}`;
+      const toast = document.getElementById("toastSuccess");
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 5000);
+      document.getElementById("btn_manage").style.display = "inline-block";
+      return accounts[0];
     } catch (error) {
-      // Handle the case where the user denies the connection or other errors
-      console.error("Error connecting to MetaMask:", error);
-      if (error.code === 4001) {
-        alert("Connection request was denied. Please allow MetaMask to connect.");
-      } else {
-        alert("Failed to connect to MetaMask. Please try again.");
-      }
-      return null;
+      console.error("User rejected connection", error);
     }
   } else {
-    // MetaMask is not installed
-    alert("MetaMask is not installed. Please install it to use this feature.");
-    return null;
+    alert("Please install MetaMask!");
   }
 }
-
-
 
 async function ensureContractInitialized() {
   if (!accountManager) {
