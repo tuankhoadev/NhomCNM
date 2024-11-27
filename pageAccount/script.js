@@ -1,14 +1,43 @@
 ("use strict");
 
 // Khởi tạo Web3 và accountManager toàn cục
-let accountManager;
 let web3;
+let contractInitialized = false;
+let accountManager; // Đối tượng hợp đồng
+
+async function ensureContractInitialized() {
+  if (contractInitialized) return;
+
+  try {
+    console.log("Initializing contract...");
+
+    const web3 = new Web3(window.ethereum); // Sử dụng Web3.js để kết nối MetaMask
+    const networkId = await web3.eth.net.getId();
+    console.log("Connected to network ID:", networkId);
+
+    const deployedNetwork = ContractABI.networks[networkId]; // Thay `ContractABI` bằng ABI hợp đồng của bạn
+    if (!deployedNetwork) {
+      throw new Error("Contract not deployed on the connected network.");
+    }
+
+    accountManager = new web3.eth.Contract(
+      ContractABI.abi, // ABI hợp đồng
+      deployedNetwork.address // Địa chỉ hợp đồng
+    );
+
+    contractInitialized = true;
+    console.log("Contract initialized successfully.");
+  } catch (error) {
+    console.error("Error initializing contract:", error);
+    throw error; // Tiếp tục ném lỗi để xử lý sau
+  }
+}
 
 // Hàm khởi tạo contract và Web3
 // ABI của hợp đồng UserManager
 
 // Kiểm tra MetaMask và kết nối hợp đồng
-const contractAddress = "0x6eabaf988c089cee787b773d03b55f5c47e38d4e";  // Địa chỉ hợp đồng
+const contractAddress = "0x85bc0de5c4ff88edd458ecdc891daf8734e0c4db";  // Địa chỉ hợp đồng
       const abi = [
         {
           "inputs": [
@@ -47,34 +76,6 @@ const contractAddress = "0x6eabaf988c089cee787b773d03b55f5c47e38d4e";  // Địa
             }
           ],
           "name": "deleteUser",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "_userId",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "_userName",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_age",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "_addressLocation",
-              "type": "string"
-            }
-          ],
-          "name": "updateUser",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -195,8 +196,36 @@ const contractAddress = "0x6eabaf988c089cee787b773d03b55f5c47e38d4e";  // Địa
           ],
           "stateMutability": "view",
           "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "_userId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "_userName",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_age",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "_addressLocation",
+              "type": "string"
+            }
+          ],
+          "name": "updateUser",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
         }
-      ];
+      ]
       async function initContract() {
         try {
           // Ensure web3 is initialized
@@ -242,27 +271,15 @@ function displayUsers(users) {
 
 
 async function checkContractConnection() {
-  if (!accountManager) {
-    console.error("Contract not initialized.");
-    alert("Contract not initialized. Please check the connection.");
-    return;
-  }
-
   try {
-    // Kiểm tra xem có thể gọi một phương thức hợp đồng hay không
-    const accountCount = await accountManager.methods.index().call();
-    console.log("Contract connected. Account count:", accountCount);
-    alert("Contract connected successfully!");
-
-    // Kiểm tra số lượng người dùng hoặc thông tin khác nếu cần
-    const users = await accountManager.methods.getAllUsers().call();
-    console.log("Users:", users);
-
+    await ensureContractInitialized(); // Đảm bảo hợp đồng đã được khởi tạo
+    console.log("Contract connection verified.");
   } catch (error) {
-    console.error("Error connecting to contract:", error);
-    alert("Failed to connect to contract. Please check the console for more details.");
+    console.error("Contract not initialized:", error);
+    alert("Contract initialization failed. Please check your connection or reload the page.");
   }
 }
+
 
 
 async function connectMetaMask() {
@@ -355,15 +372,20 @@ async function createAccount() {
   }
 }
 
-window.onload = async function () {
-  const account = await connectMetaMask();
-  if (account) {
-    displayConnectedAccount();
-    await initContract();
-    await getAllAccounts();
-  }
-};
+// Thêm nút "Thêm" vào DOM khi trang được tải
+document.addEventListener("DOMContentLoaded", () => {
+  // Tạo nút
+  const addButton = document.createElement("button");
+  addButton.id = "addButton";
+  addButton.textContent = "Thêm";
+  addButton.className = "fa-stack";
 
+  // Thêm sự kiện click cho nút
+  addButton.addEventListener("click", createAccount);
+
+  // Thêm nút vào phần thân trang
+  document.body.appendChild(addButton);
+});
 
 // Lấy thông tin tài khoản
 async function getAccount() {
