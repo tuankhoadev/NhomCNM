@@ -18,40 +18,18 @@
   <body>
     <div class="container">
       <div class="main_Custom">
-        <div class="custom_left">
-          <h2>USER MANAGER</h2>
-          <div class="button-group">
-            <!-- <button id="addAccount">Add Account</button> -->
-            <button id="editAccount" id="listAccountButton" onclick="showAccountList()">
-              List Account
-            </button>
-          </div>
-        </div>
+        
         <div class="custom_right">
           <div class="header">
-            <div class="search">
-              <div class="box">
-                <form name="search">
-                  <input
-                    type="text"
-                    class="inputSearch"
-                    name="txt"
-                    onmouseout="this.value = ''; this.blur();"
-                  />
-                </form>
-                <i class="fas fa-search"></i>
-              </div>
-            </div>
+            <div class="search" style="display: flex; align-items: center; justify-content: space-between;">
+           
+                <h3>USER MANAGER</h3>
+                <div class="btnAddAccount" style="margin: 10px;    margin-top: 61px;">
+                  <button id="btnShowAdd">Add Account</button>
+                </div>
+             </div>
 
-            <div class="btnAddAccount">
-              <button id="btnConnectWallet" onclick="connectMetaMask()">Connect Wallet</button>
-              <button id="btnConnectconnection" onclick="checkContractConnection()">Connect contract</button>
-              <span id="walletStatus" style="margin-left: 10px; font-weight: bold;">Not Connected</span>
-            </div>
-            <div id="walletInfo" style="margin-top: 10px; display: none;">
-              <p><strong>Connected Account:</strong> <span id="accountAddress"></span></p>
-              <button id="btnShowAdd">Add User</button>
-            </div>
+           
           </div>
 
   
